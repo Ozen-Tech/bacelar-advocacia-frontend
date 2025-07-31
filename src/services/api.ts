@@ -1,9 +1,12 @@
 // src/services/api.ts
 import axios from 'axios';
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+
+console.log(`API baseURL set to: ${baseURL}`); // Ótimo para depuração
+
 const api = axios.create({
-  // Aponte para a URL do seu backend. Use uma variável de ambiente no futuro.
-  baseURL: 'http://localhost:8000/api/v1', 
+  baseURL: baseURL, 
 });
 
 // Esta parte é a mágica: antes de cada requisição, ele vai checar
