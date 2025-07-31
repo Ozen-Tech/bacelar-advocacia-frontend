@@ -2,7 +2,7 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import { publicApi } from '../../services/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -20,12 +20,11 @@ export default function LoginPage() {
     formData.append('password', password);
 
     try {
-      const response = await api.post('/auth/login', formData);
-      console.log('Resposta completa do backend:', response);
-      const { access_token } = response.data;
-      
-      await login(access_token);
-      navigate('/');
+        // e use-a na chamada de login:
+        const response = await publicApi.post('/auth/login', formData);
+        const { access_token } = response.data;
+        await login(access_token);
+        navigate('/');
     } catch (err) {
       setError('Email ou senha inválidos. Tente novamente.');
       console.error('Falha no login', err);
