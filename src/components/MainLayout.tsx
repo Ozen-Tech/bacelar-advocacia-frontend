@@ -1,17 +1,16 @@
 // src/components/MainLayout.tsx
 import { Outlet, NavLink } from 'react-router-dom';
-
-// Ícones placeholder. Vamos usar ícones reais depois.
-const HomeIcon = () => <span>🏠</span>;
-const ListIcon = () => <span>📄</span>;
-const DashboardIcon = () => <span>📊</span>;
-const ProfileIcon = () => <span>👤</span>;
+// Importa os ícones reais que usaremos
+import { Home, ListChecks, LayoutDashboard, User, Bell } from 'lucide-react';
 
 const navItems = [
-  { path: '/', icon: HomeIcon, label: 'Início' },
-  { path: '/prazos', icon: ListIcon, label: 'Prazos' },
-  { path: '/dashboard-geral', icon: DashboardIcon, label: 'Dashboard Geral' },
-  { path: '/perfil', icon: ProfileIcon, label: 'Meu Perfil' },
+  // A rota '/' agora aponta para o Dashboard, então usamos o ícone Home para ele.
+  { path: '/', icon: Home, label: 'Dashboard' },
+  { path: '/prazos', icon: ListChecks, label: 'Prazos' },
+  // Desativado por enquanto, pois o dashboard geral já está em '/'
+  // { path: '/dashboard-geral', icon: LayoutDashboard, label: 'Dashboard Geral' }, 
+  { path: '/perfil', icon: User, label: 'Meu Perfil' },
+  { path: '/notificacoes', icon: Bell, label: 'Notificações' }, // Adiciona link para Notificações
 ];
 
 export default function MainLayout() {
@@ -19,18 +18,19 @@ export default function MainLayout() {
     <div className="flex h-screen bg-bacelar-black text-white">
       {/* Barra de Navegação Lateral */}
       <aside className="flex w-20 flex-col items-center space-y-8 bg-bacelar-gray-dark py-8">
-        <div className="text-3xl font-bold text-bacelar-gold">B</div>
-        <nav className="flex flex-col items-center space-y-6">
+        <div className="text-3xl font-serif text-bacelar-gold">B</div>
+        <nav className="flex flex-1 flex-col items-center justify-center space-y-6">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
-              // O `&.active` é um seletor especial do Tailwind que aplica a classe
-              // apenas quando o NavLink está ativo (URL correspondente)
-              className="text-bacelar-gray-light transition hover:text-bacelar-gold [&.active]:text-bacelar-gold"
+              // O Tailwind tem um seletor especial que funciona com NavLink do React Router:
+              // `aria-[current=page]` é o atributo que o NavLink usa para indicar a página ativa.
+              className="rounded-lg p-2 text-bacelar-gray-light transition-colors hover:bg-bacelar-gold/10 hover:text-bacelar-gold aria-[current=page]:bg-bacelar-gold/10 aria-[current=page]:text-bacelar-gold"
               title={item.label}
+              end // Adicionar 'end' na rota raiz evita que ela fique ativa em todas as sub-rotas
             >
-              <item.icon />
+              <item.icon size={24} />
             </NavLink>
           ))}
         </nav>
@@ -38,7 +38,7 @@ export default function MainLayout() {
 
       {/* Conteúdo Principal da Página */}
       <main className="flex-1 overflow-y-auto p-8">
-        <Outlet /> {/* O React Router irá renderizar a página da rota atual aqui */}
+        <Outlet /> {/* O React Router renderiza a página ativa aqui */}
       </main>
     </div>
   );

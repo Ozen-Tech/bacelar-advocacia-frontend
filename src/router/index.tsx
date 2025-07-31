@@ -5,6 +5,8 @@ import DashboardPage from '../pages/Dashboard';
 import PrazosPage from '../pages/Prazos';
 import ProtectedRoute from './ProtectedRoute';
 import PrazoDetailPage from '../pages/PrazoDetail';
+import ProfilePage from '../pages/Profile'; // Importar Perfil
+import NotificationsPage from '../pages/Notifications';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +30,8 @@ const router = createBrowserRouter([
         path: '/prazos/:id', // O ':id' é um parâmetro dinâmico
         element: <PrazoDetailPage />,
       },
+      { path: '/perfil', element: <ProfilePage /> },
+      { path: '/notificacoes', element: <NotificationsPage /> },
     ],
   },
 ]);

@@ -1,15 +1,17 @@
 // src/pages/Prazos/index.tsx
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'; // O import já estava aqui, perfeito!
+import { useEffect, useState, FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { DeadlinePublic } from '../../schemas/deadline';
+import { UserPublic } from '../../schemas/user';
 import Input from '../../components/Forms/Input';
 import Select from '../../components/Forms/Select';
-import Modal from '../../components/Shared/Modal'; 
-import DeadlineForm from '../../components/Prazos/DeadlineForm'; 
+import Modal from '../../components/Shared/Modal';
+import DeadlineForm from '../../components/Prazos/DeadlineForm';
 
 // Helper para formatar a data
 const formatDate = (dateString: string) => {
+  if (!dateString) return 'N/A';
   return new Date(dateString).toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'short',
@@ -21,26 +23,32 @@ export default function PrazosPage() {
   const [prazos, setPrazos] = useState<DeadlinePublic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Estados para o Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<DeadlinePublic | null>(null);
 
-  // Estados para os Filtros
-  const [search, setSearch] = useState('');
-  const [tipo, setTipo] = useState('');
-  const [responsavel, setResponsavel] = useState('');
+  // Estado único para os Filtros
+  const [filters, setFilters] = useState({
+    search: '',
+    type: '',
+    responsibleId: '',
+  });
+  
+  // Estado para armazenar os usuários do filtro
+  const [users, setUsers] = useState<UserPublic[]>([]);
 
-  // Lógica de busca de dados
+  // Lógica de busca de dados (agora lê do estado `filters`)
   const fetchPrazos = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
-        q: search,
-        type: tipo,
-        responsible_id: responsavel,
+        q: filters.search,
+        type: filters.type,
+        responsible_id: filters.responsibleId,
       });
 
+      // Limpa parâmetros vazios para não poluir a URL
       params.forEach((value, key) => {
         if (!value) params.delete(key);
       });
@@ -54,15 +62,38 @@ export default function PrazosPage() {
       setLoading(false);
     }
   };
-  
-  useEffect(() => {
-    fetchPrazos();
-  }, []);
 
-  const handleFilter = () => {
+  // Efeito para carregar os dados iniciais (prazos e usuários)
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const usersResponse = await api.get<UserPublic[]>('/users/');
+        setUsers(usersResponse.data);
+      } catch (err) {
+        console.error("Falha ao buscar usuários para o filtro", err);
+      }
+      fetchPrazos(); // Busca os prazos após buscar os usuários
+    };
+    
+    fetchInitialData();
+  }, []); // Executa apenas uma vez
+
+  // Handler para atualizar o estado dos filtros
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [name]: value,
+    }));
+  };
+
+  // Handler para o submit do formulário de filtros
+  const handleFilterSubmit = (e: FormEvent) => {
+    e.preventDefault();
     fetchPrazos();
   };
-  
+
+  // Funções de controle do Modal
   const handleOpenCreateModal = () => {
     setEditingDeadline(null);
     setIsModalOpen(true);
@@ -78,12 +109,12 @@ export default function PrazosPage() {
     fetchPrazos(); 
   };
   
+  // Lógica de estilização
   const getStatusClasses = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case 'fatal':
         return 'bg-red-500/20 text-red-400 border border-red-500/30';
-      case 'critico': // A palavra 'crítico' do seu enum no backend pode chegar sem acento
-      case 'crítico':
+      case 'critico':
         return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
       case 'concluido':
         return 'bg-green-500/20 text-green-400 border border-green-500/30';
@@ -95,8 +126,6 @@ export default function PrazosPage() {
   return (
     <>
       <div className="flex flex-col space-y-8">
-        
-        {/* CABEÇALHO */}
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-light text-white">LISTA DE PRAZOS</h1>
           <button 
@@ -108,32 +137,34 @@ export default function PrazosPage() {
         </div>
         <div className="border-b border-bacelar-gold/20" />
 
-        {/* FILTROS */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <Input 
-            placeholder="Pesquisar por processo ou tarefa..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            name="search"
+            placeholder="Pesquisar..."
+            value={filters.search}
+            onChange={handleFilterChange}
           />
-          <Select value={tipo} onChange={(e) => setTipo(e.target.value)}>
+          <Select name="type" value={filters.type} onChange={handleFilterChange}>
             <option value="">Todos os Tipos</option>
             <option value="Recurso">Recurso</option>
             <option value="Manifestação">Manifestação</option>
             <option value="Contestação">Contestação</option>
             <option value="Embargos">Embargos</option>
           </Select>
-          <Select value={responsavel} onChange={(e) => setResponsavel(e.target.value)}>
+          <Select name="responsibleId" value={filters.responsibleId} onChange={handleFilterChange}>
             <option value="">Todos os Responsáveis</option>
+            {users.map(user => (
+              <option key={user.id} value={user.id}>{user.name}</option>
+            ))}
           </Select>
           <button 
-            onClick={handleFilter}
+            type="submit"
             className="rounded-md bg-bacelar-gold px-5 py-2 text-center font-bold text-bacelar-black transition hover:bg-bacelar-gold-light"
           >
             FILTRAR
           </button>
-        </div>
+        </form>
 
-        {/* TABELA */}
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-bacelar-gray-light/20 text-bacelar-gray-light">
@@ -147,9 +178,11 @@ export default function PrazosPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="text-center py-8">Carregando prazos...</td></tr>
+                <tr><td colSpan={5} className="py-8 text-center text-bacelar-gray-light">Carregando prazos...</td></tr>
               ) : error ? (
-                 <tr><td colSpan={5} className="text-center py-8 text-red-500">{error}</td></tr>
+                 <tr><td colSpan={5} className="py-8 text-center text-red-500">{error}</td></tr>
+              ) : prazos.length === 0 ? (
+                <tr><td colSpan={5} className="py-8 text-center text-bacelar-gray-light">Nenhum prazo encontrado.</td></tr>
               ) : prazos.map(prazo => (
                 <tr key={prazo.id} className="border-b border-bacelar-gray-dark hover:bg-bacelar-gray-dark/50">
                   <td className="whitespace-nowrap px-6 py-4 font-mono">{prazo.process_number || 'N/A'}</td>
@@ -163,19 +196,16 @@ export default function PrazosPage() {
                   <td className="whitespace-nowrap px-6 py-4 space-x-2">
                     <button 
                       onClick={() => handleOpenEditModal(prazo)}
-                      className="border border-bacelar-gold/50 px-4 py-1 text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold text-xs rounded"
+                      className="rounded border border-bacelar-gold/50 px-4 py-1 text-xs text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
                     >
                       EDITAR
                     </button>
-
-                    {/* --- A MUDANÇA ESTÁ AQUI --- */}
                     <Link 
                         to={`/prazos/${prazo.id}`} 
-                        className="inline-block border border-bacelar-gold/50 px-4 py-1 text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold text-xs rounded"
+                        className="inline-block rounded border border-bacelar-gold/50 px-4 py-1 text-xs text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
                     >
                         VER DETALHES
                     </Link>
-                    {/* --- FIM DA MUDANÇA --- */}
                   </td>
                 </tr>
               ))}
