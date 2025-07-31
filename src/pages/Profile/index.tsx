@@ -30,7 +30,7 @@ export default function ProfilePage() {
     const payload = { name, email, phone };
 
     try {
-      const response = await api.put('/users/me', payload);
+      await api.put('/users/me', payload);
       // Força a atualização dos dados do usuário no AuthContext
       // A função login busca o usuário novamente a partir do token
       const token = localStorage.getItem('authToken');
