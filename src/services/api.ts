@@ -1,23 +1,20 @@
-// src/services/api.ts
+// src/services/api.ts (VERSÃO DE DEPLOY URGENTE)
 import axios from 'axios';
 
-// --- A MUDANÇA ESSENCIAL ESTÁ AQUI ---
+// --- CORREÇÃO DEFINITIVA ---
+// Removemos a dependência de variáveis de ambiente do Vercel temporariamente.
+// Nós estamos forçando o uso da URL de produção correta.
+const baseURL = 'https://bacelar-api.onrender.com';
 
-// Pega a URL da variável de ambiente.
-const apiUrlFromEnv = import.meta.env.VITE_API_BASE_URL;
-
-// Lógica de decisão explícita:
-// Se a variável de ambiente NÃO for definida, nós FORÇAMOS a URL de produção,
-// pois o localhost só existe em desenvolvimento.
-const baseURL = apiUrlFromEnv || 'https://bacelar-api.onrender.com';
-
-console.log(`[API Service] Conectando à URL base: ${baseURL}`);
+// Adicionamos um log para termos 100% de certeza do que está sendo usado.
+console.log(`[API Service] Conectando à base: ${baseURL}`);
 
 const api = axios.create({
-  baseURL: `${baseURL}/api/v1`, // Adicionamos o /api/v1 aqui
+  baseURL: `${baseURL}/api/v1`,
 });
-// ----------------------------------------
+// ----------------------------
 
+// O interceptor de token continua igual.
 api.interceptors.request.use(async (config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
