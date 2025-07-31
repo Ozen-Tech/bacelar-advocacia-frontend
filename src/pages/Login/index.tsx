@@ -2,7 +2,7 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { publicApi } from '../../services/api';
+import publicApi from "../../services/api"
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
