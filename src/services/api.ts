@@ -1,41 +1,33 @@
-// src/services/api.ts (VERSÃO FINAL E À PROVA DE FALHAS)
+// src/services/api.ts (VERSÃO FINAL DE PRODUÇÃO)
 import axios from 'axios';
 
-// 1. Obtém a variável de ambiente. Ela será uma string ou `undefined`.
-const envBaseURL = import.meta.env.VITE_API_BASE_URL;
+// FORÇAMOS a URL correta e segura do backend em produção.
+const baseURL = 'https://bacelar-api.onrender.com';
 
-// 2. Lógica de decisão explícita para definir a URL base.
-//    - Se a variável do ambiente existe E não é uma string vazia, use-a.
-//    - Caso contrário, use a URL de desenvolvimento.
-const baseURL = envBaseURL && envBaseURL !== ''
-  ? envBaseURL
-  : 'http://localhost:8000';
+// Log para depuração no console do navegador.
+console.log(`[API Service] Base URL configurada para: ${baseURL}`);
 
-// 3. Imprimimos no console qual URL foi escolhida. Isso é essencial para depuração.
-console.log(`[API Service] Base URL: ${baseURL}`);
-
-const api = axios.create({
-  baseURL: baseURL, // Usamos a URL base que definimos acima.
-});
-
-// O interceptor adicionará o token a todas as requisições
-api.interceptors.request.use(async (config) => {
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    // Garantimos que a URL completa começa com /api/v1
-    config.url = `/api/v1${config.url}`;
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-}, error => {
-  return Promise.reject(error);
-});
-
-
-// Interceptor para requisições que não precisam de autenticação, como o login.
+// Instância para requisições públicas (login)
 const publicApi = axios.create({
   baseURL: `${baseURL}/api/v1`,
 });
 
+// Instância para requisições privadas (que precisam de token)
+const privateApi = axios.create({
+  baseURL: `${baseURL}/api/v1`,
+});
+
+// Interceptor que adiciona o token de autenticação em cada chamada da `privateApi`
+privateApi.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 export { publicApi };
-export default api;
+export default privateApi; // Exporta a instância privada como padrão
