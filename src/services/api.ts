@@ -1,22 +1,23 @@
 // src/services/api.ts
 import axios from 'axios';
 
-// --- A CORREÇÃO ESTÁ AQUI ---
-// A baseURL precisa ser o endereço completo ATÉ o nosso prefixo de API.
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'; // Em dev, a API está em /
+// --- A MUDANÇA ESSENCIAL ESTÁ AQUI ---
 
-// Criamos a instância PRINCIPAL que aponta para o domínio
-const rawApi = axios.create({
-  baseURL: baseURL,
-});
+// Pega a URL da variável de ambiente.
+const apiUrlFromEnv = import.meta.env.VITE_API_BASE_URL;
 
-// Criamos uma SEGUNDA instância que opera dentro do nosso prefixo /api/v1
-// E que carrega o token de autenticação
+// Lógica de decisão explícita:
+// Se a variável de ambiente NÃO for definida, nós FORÇAMOS a URL de produção,
+// pois o localhost só existe em desenvolvimento.
+const baseURL = apiUrlFromEnv || 'https://bacelar-api.onrender.com';
+
+console.log(`[API Service] Conectando à URL base: ${baseURL}`);
+
 const api = axios.create({
-  baseURL: `${baseURL}/api/v1`,
+  baseURL: `${baseURL}/api/v1`, // Adicionamos o /api/v1 aqui
 });
+// ----------------------------------------
 
-// ------------------------------------
 api.interceptors.request.use(async (config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
@@ -25,5 +26,4 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-export { rawApi }; // Exportamos a instância raw para casos onde o prefixo não é necessário
-export default api; // Exportamos a instância com /api/v1 como padrão
+export default api;
