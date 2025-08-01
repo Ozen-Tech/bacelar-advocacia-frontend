@@ -1,15 +1,18 @@
 // src/services/api.ts
 import axios from 'axios';
 
-const baseURL = 'https://bacelar-api.onrender.com';
+// A única "fonte da verdade". A URL base COMPLETA da nossa API.
+const baseURL = 'https://bacelar-api.onrender.com/api/v1';
 
-console.log(`[API Service] Conectando à URL: ${baseURL}/api/v1`);
+// Log para depuração, sempre útil
+console.log(`[API Service] URL base configurada para: ${baseURL}`);
 
 const api = axios.create({
-  baseURL: `${baseURL}/api/v1`,
+  baseURL: baseURL,
 });
 
-api.interceptors.request.use(async (config) => {
+// O interceptor adiciona o token a TODAS as requisições enviadas por esta instância.
+api.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -17,10 +20,4 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// Ajuste simples para o login
-const publicApi = axios.create({
-    baseURL: `${baseURL}/api/v1`,
-});
-
-export { publicApi };
 export default api;

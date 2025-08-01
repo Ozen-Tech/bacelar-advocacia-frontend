@@ -2,7 +2,7 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import publicApi from "../../services/api"
+import api from '../../services/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -21,7 +21,7 @@ export default function LoginPage() {
 
     try {
         // e use-a na chamada de login:
-        const response = await publicApi.post('/auth/login', formData);
+        const response = await api.post('/auth/login', formData); 
         const { access_token } = response.data;
         await login(access_token);
         navigate('/');
