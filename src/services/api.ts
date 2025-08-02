@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://bacelar-api.onrender.com/api/v1"',
+  baseURL: 'https://bacelar-api.onrender.com/api/v1',
 });
 
 api.interceptors.request.use(async (config) => {
