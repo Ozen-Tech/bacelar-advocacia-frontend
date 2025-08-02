@@ -1,18 +1,20 @@
-// src/services/api.ts
 import axios from 'axios';
 
-// A única "fonte da verdade". A URL base COMPLETA da nossa API.
-const baseURL = 'https://bacelar-api.onrender.com/api/v1';
+// Determina se estamos no ambiente de produção da Vercel
+const IS_PROD = import.meta.env.PROD;
 
-// Log para depuração, sempre útil
-console.log(`[API Service] URL base configurada para: ${baseURL}`);
+// Define a baseURL baseada no ambiente
+const baseURL = IS_PROD
+  ? 'https://bacelar-api.onrender.com' // Sempre HTTPS em produção
+  : 'http://localhost:8000';           // HTTP em desenvolvimento
+
+console.log(`[API Service] Ambiente de Produção: ${IS_PROD}. Usando URL base: ${baseURL}`);
 
 const api = axios.create({
-  baseURL: baseURL,
+  baseURL: `${baseURL}/api/v1`,
 });
 
-// O interceptor adiciona o token a TODAS as requisições enviadas por esta instância.
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
