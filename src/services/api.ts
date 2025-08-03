@@ -1,7 +1,9 @@
 // src/services/api.ts
 import axios from 'axios';
 
-const baseURL = 'https://bacelar-api.onrender.com';
+// Lê a URL base da variável de ambiente VITE_API_BASE_URL.
+// Se não estiver definida, usa a URL do localhost como fallback para desenvolvimento.
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 console.log(`[API Service] Conectando à base: ${baseURL}`);
 
@@ -17,5 +19,4 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// Simplificamos de volta, o interceptor não vai atrapalhar o login
 export default api;
