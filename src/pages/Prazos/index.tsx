@@ -53,7 +53,7 @@ export default function PrazosPage() {
         if (!value) params.delete(key);
       });
 
-      const response = await api.get<DeadlinePublic[]>(`/deadlines?${params.toString()}`);
+      const response = await api.get<DeadlinePublic[]>(`/deadlines/?${params.toString()}`);
       setPrazos(response.data);
     } catch (err) {
       setError('Não foi possível carregar os prazos.');
