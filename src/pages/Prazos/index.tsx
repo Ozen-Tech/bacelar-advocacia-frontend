@@ -1,5 +1,5 @@
 // src/pages/Prazos/index.tsx
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, FormEvent} from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { DeadlinePublic } from '../../schemas/deadline';
@@ -213,7 +213,7 @@ export default function PrazosPage() {
           </table>
         </div>
       </div>
-      
+
       <Modal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -222,6 +222,7 @@ export default function PrazosPage() {
         <DeadlineForm 
           deadline={editingDeadline}
           onSuccess={handleSuccess}
+          users={users} 
         />
       </Modal>
     </>

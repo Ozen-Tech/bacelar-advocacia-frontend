@@ -4,13 +4,15 @@ import api from '../../services/api';
 import Input from '../Forms/Input';
 import Select from '../Forms/Select';
 import { DeadlinePublic } from '../../schemas/deadline';
+import { UserPublic } from '../../schemas/user';
 
 interface DeadlineFormProps {
   deadline?: DeadlinePublic | null; // O prazo a ser editado (opcional)
   onSuccess: () => void; // Função para chamar após o sucesso
+  users: UserPublic[];
 }
 
-export default function DeadlineForm({ deadline, onSuccess }: DeadlineFormProps) {
+export default function DeadlineForm({ deadline, onSuccess, users}: DeadlineFormProps) {
   // Estados para cada campo do formulário
   const [taskDescription, setTaskDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -98,7 +100,11 @@ export default function DeadlineForm({ deadline, onSuccess }: DeadlineFormProps)
         </Select>
         <Select value={responsibleUserId} onChange={(e) => setResponsibleUserId(e.target.value)}>
           <option value="">Selecione um Responsável</option>
-          {/* Esta lista deve vir da API no futuro */}
+          {users.map(user => (
+            <option key={user.id} value={user.id}>
+              {user.name}
+            </option>
+          ))}
         </Select>
       </div>
       
