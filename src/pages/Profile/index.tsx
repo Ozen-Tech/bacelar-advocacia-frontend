@@ -3,6 +3,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import Input from '../../components/Forms/Input';
+import PasswordChangeForm from '../../components/Forms/PasswordChangeForm';
 
 export default function ProfilePage() {
   const { user, login } = useAuth(); // Usamos o 'login' para forçar a atualização dos dados do usuário
@@ -62,6 +63,12 @@ export default function ProfilePage() {
             <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             <Input placeholder="Telefone" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
+        </div>
+
+        {/* Alterar Senha */}
+        <div className="p-8 bg-bacelar-gray-dark rounded-lg">
+          <h2 className="text-xl font-bold mb-6 text-white">ALTERAR SENHA</h2>
+          <PasswordChangeForm />
         </div>
 
         {/* Preferências e Ações */}
