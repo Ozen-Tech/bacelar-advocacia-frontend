@@ -8,6 +8,13 @@ import Input from '../../components/Forms/Input';
 import Select from '../../components/Forms/Select';
 import Modal from '../../components/Shared/Modal';
 import DeadlineForm from '../../components/Prazos/DeadlineForm';
+import PrazosDashboard from '../../components/Prazos/PrazosDashboard';
+import AdvancedFilters from '../../components/Prazos/AdvancedFilters';
+import BulkActions from '../../components/Prazos/BulkActions';
+import EnhancedTable from '../../components/Prazos/EnhancedTable';
+import ExportActions from '../../components/Prazos/ExportActions';
+import { UrgencyLegend } from '../../components/Prazos/UrgencyIndicator';
+import DeadlineDetailsModal from '../../components/Prazos/DeadlineDetailsModal';
 import { useAuth } from '../../context/AuthContext';
 
 // Helper para formatar a data
@@ -44,7 +51,16 @@ export default function PrazosPage() {
     responsibleId: '',
     classification: '',
     status: '',
+    dueDateFrom: '',
+    dueDateTo: '',
+    daysUntilDue: '',
+    processNumber: '',
+    parties: ''
   });
+  const [selectedDeadlines, setSelectedDeadlines] = useState<string[]>([]);
+  const [showDashboard, setShowDashboard] = useState(true);
+  const [selectedDeadlineForDetails, setSelectedDeadlineForDetails] = useState<DeadlinePublic | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   
   // Estado para armazenar os usuários do filtro
   const [users, setUsers] = useState<UserPublic[]>([]);
@@ -92,18 +108,74 @@ export default function PrazosPage() {
   }, []); // Executa apenas uma vez
 
   // Handler para atualizar o estado dos filtros
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      [name]: value,
-    }));
+  const handleFilterChange = (name: string, value: string) => {
+    setFilters(prev => ({ ...prev, [name]: value }));
   };
 
   // Handler para o submit do formulário de filtros
   const handleFilterSubmit = (e: FormEvent) => {
     e.preventDefault();
     fetchPrazos();
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      search: '',
+      type: '',
+      responsibleId: '',
+      classification: '',
+      status: '',
+      dueDateFrom: '',
+      dueDateTo: '',
+      daysUntilDue: '',
+      processNumber: '',
+      parties: ''
+    });
+    fetchPrazos();
+  };
+
+  const handleQuickFilter = (filterType: string) => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
+    const next15Days = new Date(today);
+    next15Days.setDate(today.getDate() + 15);
+
+    switch (filterType) {
+      case 'today':
+        setFilters(prev => ({
+          ...prev,
+          dueDateFrom: today.toISOString().split('T')[0],
+          dueDateTo: today.toISOString().split('T')[0]
+        }));
+        break;
+      case 'thisWeek':
+        setFilters(prev => ({
+          ...prev,
+          dueDateFrom: today.toISOString().split('T')[0],
+          dueDateTo: nextWeek.toISOString().split('T')[0]
+        }));
+        break;
+      case 'next15Days':
+        setFilters(prev => ({
+          ...prev,
+          dueDateFrom: today.toISOString().split('T')[0],
+          dueDateTo: next15Days.toISOString().split('T')[0]
+        }));
+        break;
+      case 'critical':
+        setFilters(prev => ({ ...prev, classification: 'critico' }));
+        break;
+      case 'fatal':
+        setFilters(prev => ({ ...prev, classification: 'fatal' }));
+        break;
+      case 'overdue':
+        setFilters(prev => ({ ...prev, daysUntilDue: 'overdue' }));
+        break;
+    }
+    setTimeout(() => fetchPrazos(), 100);
   };
 
   // Funções de controle do Modal
@@ -145,6 +217,43 @@ export default function PrazosPage() {
       setIsDeleting(false);
     }
   };
+
+  const handleBulkStatusChange = async (deadlineIds: string[], newStatus: string) => {
+    try {
+      await Promise.all(
+        deadlineIds.map(id => 
+          api.put(`/deadlines/${id}`, { status: newStatus })
+        )
+      );
+      fetchPrazos();
+    } catch (error) {
+      console.error('Erro ao alterar status em lote:', error);
+    }
+  };
+
+  const handleBulkResponsibleChange = async (deadlineIds: string[], newResponsibleId: string) => {
+    try {
+      await Promise.all(
+        deadlineIds.map(id => 
+          api.put(`/deadlines/${id}`, { responsible_user_id: newResponsibleId })
+        )
+      );
+      fetchPrazos();
+    } catch (error) {
+      console.error('Erro ao alterar responsável em lote:', error);
+    }
+  };
+
+  const handleBulkDelete = async (deadlineIds: string[]) => {
+    try {
+      await Promise.all(
+        deadlineIds.map(id => api.delete(`/deadlines/${id}`))
+      );
+      fetchPrazos();
+    } catch (error) {
+      console.error('Erro ao excluir prazos em lote:', error);
+    }
+  };
   
   const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
@@ -165,181 +274,101 @@ export default function PrazosPage() {
     }
   };
 
+  const handleViewDetails = (deadline: DeadlinePublic) => {
+    setSelectedDeadlineForDetails(deadline);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedDeadlineForDetails(null);
+  };
+
   return (
     <>
       <div className="flex flex-col space-y-8">
         <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
           <h1 className="text-4xl font-light text-white">LISTA DE PRAZOS</h1>
+          <button
+            onClick={() => setShowDashboard(!showDashboard)}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+              showDashboard 
+                ? 'bg-bacelar-gold/20 text-bacelar-gold hover:bg-bacelar-gold/30' 
+                : 'bg-bacelar-gray-dark text-bacelar-gray-light hover:bg-bacelar-gray-light/20'
+            }`}
+          >
+            {showDashboard ? 'Ocultar Dashboard' : 'Mostrar Dashboard'}
+          </button>
+        </div>
+        <div className="flex items-center gap-3">
+          <ExportActions 
+            deadlines={prazos} 
+            selectedDeadlines={selectedDeadlines}
+          />
           {user?.profile === 'admin' && (
             <button 
               onClick={handleOpenCreateModal}
-              className="rounded-md bg-bacelar-gold px-4 py-2 font-semibold text-bacelar-black transition hover:bg-bacelar-gold-light"
+              className="rounded-md bg-bacelar-gold px-5 py-2 text-center font-bold text-bacelar-black transition hover:bg-bacelar-gold-light"
             >
-              + Novo Prazo
+              NOVO PRAZO
             </button>
           )}
         </div>
+        </div>
         <div className="border-b border-bacelar-gold/20" />
 
-        <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-          <Input 
-            name="search"
-            placeholder="Pesquisar..."
-            value={filters.search}
-            onChange={handleFilterChange}
-          />
-          <Select name="type" value={filters.type} onChange={handleFilterChange}>
-            <option value="">Todos os Tipos</option>
-            <option value="Recurso">Recurso</option>
-            <option value="Manifestação">Manifestação</option>
-            <option value="Contestação">Contestação</option>
-            <option value="Embargos">Embargos</option>
-          </Select>
-          <Select name="responsibleId" value={filters.responsibleId} onChange={handleFilterChange}>
-            <option value="">Todos os Responsáveis</option>
-            {users.map(user => (
-              <option key={user.id} value={user.id}>{user.name}</option>
-            ))}
-          </Select>
-          <Select name="classification" value={filters.classification} onChange={handleFilterChange}>
-            <option value="">Todas as Classificações</option>
-            <option value="normal">Normal</option>
-            <option value="critico">Crítico</option>
-            <option value="fatal">Fatal</option>
-          </Select>
-          <Select name="status" value={filters.status} onChange={handleFilterChange}>
-            <option value="">Todos os Status</option>
-            <option value="pendente">Pendente</option>
-            <option value="concluido">Concluído</option>
-            <option value="cancelado">Cancelado</option>
-          </Select>
-          <button 
-            type="submit"
-            className="rounded-md bg-bacelar-gold px-5 py-2 text-center font-bold text-bacelar-black transition hover:bg-bacelar-gold-light"
-          >
-            FILTRAR
-          </button>
-        </form>
+        {/* Dashboard */}
+         {showDashboard && (
+           <div className="mb-6">
+             <PrazosDashboard prazos={prazos} loading={loading} />
+           </div>
+         )}
 
-        {/* Tabela de Prazos - Desktop */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-bacelar-gray-light/20 text-bacelar-gray-light">
-              <tr>
-                <th scope="col" className="px-6 py-4">Processo</th>
-                <th scope="col" className="px-6 py-4">Tipo de Prazo</th>
-                <th scope="col" className="px-6 py-4">Data de Vencimento</th>
-                <th scope="col" className="px-6 py-4">Classificação</th>
-                <th scope="col" className="px-6 py-4">Status</th>
-                <th scope="col" className="px-6 py-4">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan={6} className="py-8 text-center text-bacelar-gray-light">Carregando prazos...</td></tr>
-              ) : error ? (
-                 <tr><td colSpan={6} className="py-8 text-center text-red-500">{error}</td></tr>
-              ) : prazos.length === 0 ? (
-                <tr><td colSpan={6} className="py-8 text-center text-bacelar-gray-light">Nenhum prazo encontrado.</td></tr>
-              ) : prazos.map(prazo => (
-                <tr key={prazo.id} className="border-b border-bacelar-gray-dark hover:bg-bacelar-gray-dark/50">
-                  <td className="whitespace-nowrap px-6 py-4 font-mono">{prazo.process_number || 'N/A'}</td>
-                  <td className="whitespace-nowrap px-6 py-4">{prazo.type || 'N/A'}</td>
-                  <td className="whitespace-nowrap px-6 py-4">{formatDate(prazo.due_date.toString())}</td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClasses(prazo.classification)}`}>
-                      {prazo.classification.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <span className="inline-flex rounded-full px-2 text-xs font-semibold leading-5 bg-gray-100 text-gray-800">
-                      {prazo.status || 'pendente'}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 space-x-2">
-                    {(user?.profile === 'admin' || prazo.responsible?.id === user?.id) && (
-                      <button 
-                        onClick={() => handleOpenEditModal(prazo)}
-                        className="rounded border border-bacelar-gold/50 px-4 py-1 text-xs text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
-                      >
-                        EDITAR
-                      </button>
-                    )}
-                    <Link 
-                        to={`/prazos/${prazo.id}`} 
-                        className="inline-block rounded border border-bacelar-gold/50 px-4 py-1 text-xs text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
-                    >
-                        VER DETALHES
-                    </Link>
-                    {user?.profile === 'admin' && (
-                      <button 
-                        onClick={() => handleOpenDeleteModal(prazo)}
-                        className="rounded border border-red-500/50 px-4 py-1 text-xs text-red-400 transition hover:border-red-500 hover:text-red-500"
-                      >
-                        EXCLUIR
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Filtros Avançados */}
+         <div className="mb-6">
+           <AdvancedFilters
+             filters={filters}
+             users={users}
+             onFilterChange={handleFilterChange}
+             onFilterSubmit={handleFilterSubmit}
+             onClearFilters={handleClearFilters}
+             onQuickFilter={handleQuickFilter}
+           />
+         </div>
+
+        {/* Ações em Lote */}
+         {selectedDeadlines.length > 0 && (
+           <div className="mb-6">
+             <BulkActions
+               selectedDeadlines={selectedDeadlines}
+               deadlines={prazos}
+               users={users}
+               onBulkStatusChange={handleBulkStatusChange}
+               onBulkResponsibleChange={handleBulkResponsibleChange}
+               onBulkDelete={handleBulkDelete}
+               onClearSelection={() => setSelectedDeadlines([])}
+             />
+           </div>
+         )}
+
+        {/* Legenda de Urgência */}
+        <div className="mb-6">
+          <UrgencyLegend />
         </div>
 
-        {/* Cards de Prazos - Mobile */}
-        <div className="lg:hidden space-y-4">
-          {loading ? (
-            <div className="py-8 text-center text-bacelar-gray-light">Carregando prazos...</div>
-          ) : error ? (
-            <div className="py-8 text-center text-red-500">{error}</div>
-          ) : prazos.length === 0 ? (
-            <div className="py-8 text-center text-bacelar-gray-light">Nenhum prazo encontrado.</div>
-          ) : prazos.map(prazo => (
-            <div key={prazo.id} className="bg-bacelar-gray-dark rounded-lg border border-bacelar-gray-light/20 p-4 shadow">
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="font-mono text-white font-medium">{prazo.process_number || 'N/A'}</h3>
-                <div className="flex space-x-2">
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClasses(prazo.classification)}`}>
-                    {prazo.classification.toUpperCase()}
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-2 text-sm text-bacelar-gray-light">
-                <div><span className="font-medium text-white">Tipo:</span> {prazo.type || 'N/A'}</div>
-                <div><span className="font-medium text-white">Vencimento:</span> {formatDate(prazo.due_date.toString())}</div>
-                <div><span className="font-medium text-white">Status:</span> 
-                  <span className="ml-1 inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-800">
-                    {prazo.status || 'pendente'}
-                  </span>
-                </div>
-              </div>
-              <div className="mt-4 flex space-x-2">
-                {(user?.profile === 'admin' || prazo.responsible?.id === user?.id) && (
-                  <button 
-                    onClick={() => handleOpenEditModal(prazo)}
-                    className="flex-1 rounded border border-bacelar-gold/50 px-3 py-2 text-sm text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
-                  >
-                    EDITAR
-                  </button>
-                )}
-                <Link 
-                  to={`/prazos/${prazo.id}`}
-                  className="flex-1 text-center rounded border border-bacelar-gold/50 px-3 py-2 text-sm text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
-                >
-                  DETALHES
-                </Link>
-                {user?.profile === 'admin' && (
-                  <button 
-                    onClick={() => handleOpenDeleteModal(prazo)}
-                    className="flex-1 rounded border border-red-500/50 px-3 py-2 text-sm text-red-400 transition hover:border-red-500 hover:text-red-500"
-                  >
-                    EXCLUIR
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Tabela Aprimorada */}
+         <EnhancedTable
+           deadlines={prazos}
+           users={users}
+           currentUser={user}
+           selectedDeadlines={selectedDeadlines}
+           onSelectionChange={setSelectedDeadlines}
+           onEdit={handleOpenEditModal}
+           onDelete={handleOpenDeleteModal}
+           onViewDetails={handleViewDetails}
+           loading={loading}
+         />
       </div>
 
       <Modal 
@@ -398,6 +427,15 @@ export default function PrazosPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Modal de Detalhes do Prazo */}
+      <DeadlineDetailsModal
+        deadline={selectedDeadlineForDetails}
+        users={users}
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+        onUpdate={fetchPrazos}
+      />
     </>
   );
 }
