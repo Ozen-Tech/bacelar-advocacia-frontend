@@ -8,6 +8,7 @@ import Input from '../../components/Forms/Input';
 import Select from '../../components/Forms/Select';
 import Modal from '../../components/Shared/Modal';
 import DeadlineForm from '../../components/Prazos/DeadlineForm';
+import { useAuth } from '../../context/AuthContext';
 
 // Helper para formatar a data
 const formatDate = (dateString: string) => {
@@ -27,6 +28,14 @@ export default function PrazosPage() {
   // Estados para o Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<DeadlinePublic | null>(null);
+  
+  // Estados para o Modal de Confirmação de Exclusão
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deadlineToDelete, setDeadlineToDelete] = useState<DeadlinePublic | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Contexto de autenticação
+  const { user } = useAuth();
 
   // Estado único para os Filtros
   const [filters, setFilters] = useState({
@@ -113,6 +122,35 @@ export default function PrazosPage() {
     fetchPrazos(); 
   };
   
+  // Funções para exclusão
+  const handleOpenDeleteModal = (deadline: DeadlinePublic) => {
+    setDeadlineToDelete(deadline);
+    setIsDeleteModalOpen(true);
+  };
+  
+  const handleDeleteDeadline = async () => {
+    if (!deadlineToDelete) return;
+    
+    try {
+      setIsDeleting(true);
+      await api.delete(`/deadlines/${deadlineToDelete.id}`);
+      setIsDeleteModalOpen(false);
+      setDeadlineToDelete(null);
+      fetchPrazos(); // Recarrega a lista
+    } catch (err: any) {
+      console.error('Erro ao excluir prazo:', err);
+      const errorMessage = err.response?.data?.detail || 'Erro ao excluir prazo';
+      setError(errorMessage);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+  
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setDeadlineToDelete(null);
+  };
+  
   // Lógica de estilização
   const getStatusClasses = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -132,12 +170,14 @@ export default function PrazosPage() {
       <div className="flex flex-col space-y-8">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-light text-white">LISTA DE PRAZOS</h1>
-          <button 
-            onClick={handleOpenCreateModal}
-            className="rounded-md bg-bacelar-gold px-4 py-2 font-semibold text-bacelar-black transition hover:bg-bacelar-gold-light"
-          >
-            + Novo Prazo
-          </button>
+          {user?.profile === 'admin' && (
+            <button 
+              onClick={handleOpenCreateModal}
+              className="rounded-md bg-bacelar-gold px-4 py-2 font-semibold text-bacelar-black transition hover:bg-bacelar-gold-light"
+            >
+              + Novo Prazo
+            </button>
+          )}
         </div>
         <div className="border-b border-bacelar-gold/20" />
 
@@ -217,18 +257,28 @@ export default function PrazosPage() {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 space-x-2">
-                    <button 
-                      onClick={() => handleOpenEditModal(prazo)}
-                      className="rounded border border-bacelar-gold/50 px-4 py-1 text-xs text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
-                    >
-                      EDITAR
-                    </button>
+                    {(user?.profile === 'admin' || prazo.responsible?.id === user?.id) && (
+                      <button 
+                        onClick={() => handleOpenEditModal(prazo)}
+                        className="rounded border border-bacelar-gold/50 px-4 py-1 text-xs text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
+                      >
+                        EDITAR
+                      </button>
+                    )}
                     <Link 
                         to={`/prazos/${prazo.id}`} 
                         className="inline-block rounded border border-bacelar-gold/50 px-4 py-1 text-xs text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
                     >
                         VER DETALHES
                     </Link>
+                    {user?.profile === 'admin' && (
+                      <button 
+                        onClick={() => handleOpenDeleteModal(prazo)}
+                        className="rounded border border-red-500/50 px-4 py-1 text-xs text-red-400 transition hover:border-red-500 hover:text-red-500"
+                      >
+                        EXCLUIR
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -264,18 +314,28 @@ export default function PrazosPage() {
                 </div>
               </div>
               <div className="mt-4 flex space-x-2">
-                <button 
-                  onClick={() => handleOpenEditModal(prazo)}
-                  className="flex-1 rounded border border-bacelar-gold/50 px-3 py-2 text-sm text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
-                >
-                  EDITAR
-                </button>
+                {(user?.profile === 'admin' || prazo.responsible?.id === user?.id) && (
+                  <button 
+                    onClick={() => handleOpenEditModal(prazo)}
+                    className="flex-1 rounded border border-bacelar-gold/50 px-3 py-2 text-sm text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
+                  >
+                    EDITAR
+                  </button>
+                )}
                 <Link 
                   to={`/prazos/${prazo.id}`}
                   className="flex-1 text-center rounded border border-bacelar-gold/50 px-3 py-2 text-sm text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
                 >
                   DETALHES
                 </Link>
+                {user?.profile === 'admin' && (
+                  <button 
+                    onClick={() => handleOpenDeleteModal(prazo)}
+                    className="flex-1 rounded border border-red-500/50 px-3 py-2 text-sm text-red-400 transition hover:border-red-500 hover:text-red-500"
+                  >
+                    EXCLUIR
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -292,6 +352,51 @@ export default function PrazosPage() {
           onSuccess={handleSuccess}
           users={users} 
         />
+      </Modal>
+
+      {/* Modal de Confirmação de Exclusão */}
+      <Modal 
+        isOpen={isDeleteModalOpen}
+        onClose={handleCancelDelete}
+        title="Confirmar Exclusão"
+      >
+        <div className="space-y-4">
+          <p className="text-bacelar-gray-light">
+            Tem certeza que deseja excluir o prazo?
+          </p>
+          {deadlineToDelete && (
+            <div className="bg-bacelar-gray-dark rounded-lg p-4 border border-bacelar-gray-light/20">
+              <p className="text-white font-medium">
+                {deadlineToDelete.task_description}
+              </p>
+              <p className="text-sm text-bacelar-gray-light mt-1">
+                Processo: {deadlineToDelete.process_number || 'N/A'}
+              </p>
+              <p className="text-sm text-bacelar-gray-light">
+                Vencimento: {formatDate(deadlineToDelete.due_date.toString())}
+              </p>
+            </div>
+          )}
+          <p className="text-red-400 text-sm">
+            ⚠️ Esta ação não pode ser desfeita.
+          </p>
+          <div className="flex space-x-3 pt-4">
+            <button
+              onClick={handleCancelDelete}
+              disabled={isDeleting}
+              className="flex-1 rounded-md border border-bacelar-gray-light/30 px-4 py-2 text-bacelar-gray-light transition hover:border-bacelar-gray-light hover:text-white disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleDeleteDeadline}
+              disabled={isDeleting}
+              className="flex-1 rounded-md bg-red-600 px-4 py-2 text-white transition hover:bg-red-700 disabled:opacity-50"
+            >
+              {isDeleting ? 'Excluindo...' : 'Excluir'}
+            </button>
+          </div>
+        </div>
       </Modal>
     </>
   );
