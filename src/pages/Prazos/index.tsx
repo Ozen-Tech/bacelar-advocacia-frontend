@@ -33,6 +33,8 @@ export default function PrazosPage() {
     search: '',
     type: '',
     responsibleId: '',
+    classification: '',
+    status: '',
   });
   
   // Estado para armazenar os usuários do filtro
@@ -46,6 +48,8 @@ export default function PrazosPage() {
         q: filters.search,
         type: filters.type,
         responsible_id: filters.responsibleId,
+        classification: filters.classification,
+        status: filters.status,
       });
 
       // Limpa parâmetros vazios para não poluir a URL
@@ -137,7 +141,7 @@ export default function PrazosPage() {
         </div>
         <div className="border-b border-bacelar-gold/20" />
 
-        <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <Input 
             name="search"
             placeholder="Pesquisar..."
@@ -157,6 +161,18 @@ export default function PrazosPage() {
               <option key={user.id} value={user.id}>{user.name}</option>
             ))}
           </Select>
+          <Select name="classification" value={filters.classification} onChange={handleFilterChange}>
+            <option value="">Todas as Classificações</option>
+            <option value="normal">Normal</option>
+            <option value="critico">Crítico</option>
+            <option value="fatal">Fatal</option>
+          </Select>
+          <Select name="status" value={filters.status} onChange={handleFilterChange}>
+            <option value="">Todos os Status</option>
+            <option value="pendente">Pendente</option>
+            <option value="concluido">Concluído</option>
+            <option value="cancelado">Cancelado</option>
+          </Select>
           <button 
             type="submit"
             className="rounded-md bg-bacelar-gold px-5 py-2 text-center font-bold text-bacelar-black transition hover:bg-bacelar-gold-light"
@@ -165,24 +181,26 @@ export default function PrazosPage() {
           </button>
         </form>
 
-        <div className="overflow-x-auto">
+        {/* Tabela de Prazos - Desktop */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-bacelar-gray-light/20 text-bacelar-gray-light">
               <tr>
                 <th scope="col" className="px-6 py-4">Processo</th>
                 <th scope="col" className="px-6 py-4">Tipo de Prazo</th>
                 <th scope="col" className="px-6 py-4">Data de Vencimento</th>
+                <th scope="col" className="px-6 py-4">Classificação</th>
                 <th scope="col" className="px-6 py-4">Status</th>
                 <th scope="col" className="px-6 py-4">Ações</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="py-8 text-center text-bacelar-gray-light">Carregando prazos...</td></tr>
+                <tr><td colSpan={6} className="py-8 text-center text-bacelar-gray-light">Carregando prazos...</td></tr>
               ) : error ? (
-                 <tr><td colSpan={5} className="py-8 text-center text-red-500">{error}</td></tr>
+                 <tr><td colSpan={6} className="py-8 text-center text-red-500">{error}</td></tr>
               ) : prazos.length === 0 ? (
-                <tr><td colSpan={5} className="py-8 text-center text-bacelar-gray-light">Nenhum prazo encontrado.</td></tr>
+                <tr><td colSpan={6} className="py-8 text-center text-bacelar-gray-light">Nenhum prazo encontrado.</td></tr>
               ) : prazos.map(prazo => (
                 <tr key={prazo.id} className="border-b border-bacelar-gray-dark hover:bg-bacelar-gray-dark/50">
                   <td className="whitespace-nowrap px-6 py-4 font-mono">{prazo.process_number || 'N/A'}</td>
@@ -191,6 +209,11 @@ export default function PrazosPage() {
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClasses(prazo.classification)}`}>
                       {prazo.classification.toUpperCase()}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <span className="inline-flex rounded-full px-2 text-xs font-semibold leading-5 bg-gray-100 text-gray-800">
+                      {prazo.status || 'pendente'}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 space-x-2">
@@ -211,6 +234,51 @@ export default function PrazosPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Cards de Prazos - Mobile */}
+        <div className="lg:hidden space-y-4">
+          {loading ? (
+            <div className="py-8 text-center text-bacelar-gray-light">Carregando prazos...</div>
+          ) : error ? (
+            <div className="py-8 text-center text-red-500">{error}</div>
+          ) : prazos.length === 0 ? (
+            <div className="py-8 text-center text-bacelar-gray-light">Nenhum prazo encontrado.</div>
+          ) : prazos.map(prazo => (
+            <div key={prazo.id} className="bg-bacelar-gray-dark rounded-lg border border-bacelar-gray-light/20 p-4 shadow">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-mono text-white font-medium">{prazo.process_number || 'N/A'}</h3>
+                <div className="flex space-x-2">
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClasses(prazo.classification)}`}>
+                    {prazo.classification.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-2 text-sm text-bacelar-gray-light">
+                <div><span className="font-medium text-white">Tipo:</span> {prazo.type || 'N/A'}</div>
+                <div><span className="font-medium text-white">Vencimento:</span> {formatDate(prazo.due_date.toString())}</div>
+                <div><span className="font-medium text-white">Status:</span> 
+                  <span className="ml-1 inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-800">
+                    {prazo.status || 'pendente'}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-4 flex space-x-2">
+                <button 
+                  onClick={() => handleOpenEditModal(prazo)}
+                  className="flex-1 rounded border border-bacelar-gold/50 px-3 py-2 text-sm text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
+                >
+                  EDITAR
+                </button>
+                <Link 
+                  to={`/prazos/${prazo.id}`}
+                  className="flex-1 text-center rounded border border-bacelar-gold/50 px-3 py-2 text-sm text-bacelar-gold/80 transition hover:border-bacelar-gold hover:text-bacelar-gold"
+                >
+                  DETALHES
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
