@@ -268,7 +268,7 @@ export default function EnhancedTable({
           </thead>
           
           <tbody>
-            {paginatedDeadlines.map((deadline, index) => (
+            {paginatedDeadlines.map((deadline) => (
               <tr 
                 key={deadline.id}
                 className={`border-t border-bacelar-gray-light/10 hover:bg-bacelar-gray-light/5 transition-colors ${

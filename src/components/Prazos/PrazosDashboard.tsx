@@ -1,6 +1,5 @@
 // src/components/Prazos/PrazosDashboard.tsx
 import { useState, useEffect } from 'react';
-import api from '../../services/api';
 import { DeadlinePublic } from '../../schemas/deadline';
 
 interface DashboardStats {

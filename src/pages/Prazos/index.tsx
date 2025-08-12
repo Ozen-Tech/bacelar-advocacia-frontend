@@ -1,11 +1,8 @@
 // src/pages/Prazos/index.tsx
-import { useEffect, useState, FormEvent} from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState, FormEvent } from 'react';
 import api from '../../services/api';
 import { DeadlinePublic } from '../../schemas/deadline';
 import { UserPublic } from '../../schemas/user';
-import Input from '../../components/Forms/Input';
-import Select from '../../components/Forms/Select';
 import Modal from '../../components/Shared/Modal';
 import DeadlineForm from '../../components/Prazos/DeadlineForm';
 import PrazosDashboard from '../../components/Prazos/PrazosDashboard';
@@ -30,7 +27,7 @@ const formatDate = (dateString: string) => {
 export default function PrazosPage() {
   const [prazos, setPrazos] = useState<DeadlinePublic[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [_error, setError] = useState('');
 
   // Estados para o Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -261,18 +258,6 @@ export default function PrazosPage() {
   };
   
   // Lógica de estilização
-  const getStatusClasses = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'fatal':
-        return 'bg-red-500/20 text-red-400 border border-red-500/30';
-      case 'critico':
-        return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
-      case 'concluido':
-        return 'bg-green-500/20 text-green-400 border border-green-500/30';
-      default:
-        return 'bg-bacelar-gray-dark text-bacelar-gray-light border border-bacelar-gray-light/20';
-    }
-  };
 
   const handleViewDetails = (deadline: DeadlinePublic) => {
     setSelectedDeadlineForDetails(deadline);
