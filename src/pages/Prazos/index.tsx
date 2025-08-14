@@ -12,6 +12,7 @@ import EnhancedTable from '../../components/Prazos/EnhancedTable';
 import ExportActions from '../../components/Prazos/ExportActions';
 import { UrgencyLegend } from '../../components/Prazos/UrgencyIndicator';
 import DeadlineDetailsModal from '../../components/Prazos/DeadlineDetailsModal';
+import { ExcelImport } from '../../components/Prazos/ExcelImport';
 import { useAuth } from '../../context/AuthContext';
 
 // Helper para formatar a data
@@ -321,6 +322,13 @@ export default function PrazosPage() {
              onQuickFilter={handleQuickFilter}
            />
          </div>
+
+        {/* Importação Excel - apenas para admins */}
+        {user?.profile === 'admin' && (
+          <div className="mb-6">
+            <ExcelImport onImportComplete={fetchPrazos} />
+          </div>
+        )}
 
         {/* Ações em Lote */}
          {selectedDeadlines.length > 0 && (

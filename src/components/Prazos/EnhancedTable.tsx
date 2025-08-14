@@ -214,13 +214,7 @@ export default function EnhancedTable({
               </th>
               
               <th className={`${densityClasses[density]} text-left`}>
-                <button
-                  onClick={() => handleSort('task_description')}
-                  className="flex items-center space-x-1 text-bacelar-gray-light hover:text-white font-medium"
-                >
-                  <span>Descrição</span>
-                  <span>{getSortIcon('task_description')}</span>
-                </button>
+                <span className="text-bacelar-gray-light font-medium">Partes</span>
               </th>
               
               <th className={`${densityClasses[density]} text-left`}>
@@ -288,9 +282,9 @@ export default function EnhancedTable({
                   {formatDate(deadline.due_date)}
                 </td>
                 
-                <td className={`${densityClasses[density]} text-white`}>
-                  <div className="max-w-xs truncate" title={deadline.task_description}>
-                    {deadline.task_description}
+                <td className={`${densityClasses[density]} text-bacelar-gray-light`}>
+                  <div className="max-w-xs truncate" title={deadline.parties || 'N/A'}>
+                    {deadline.parties || 'N/A'}
                   </div>
                 </td>
                 
@@ -374,7 +368,7 @@ export default function EnhancedTable({
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 border border-bacelar-gray-light/30 rounded text-sm text-bacelar-gray-light hover:text-white hover:border-bacelar-gray-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1 border border-bacelar-gray-light/30 rounded text-sm text-white hover:text-bacelar-gold hover:border-bacelar-gold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Anterior
               </button>
@@ -389,7 +383,7 @@ export default function EnhancedTable({
                       className={`px-3 py-1 rounded text-sm transition-colors ${
                         currentPage === page
                           ? 'bg-bacelar-gold text-bacelar-black font-medium'
-                          : 'text-bacelar-gray-light hover:text-white'
+                          : 'text-white hover:text-bacelar-gold hover:bg-bacelar-gold/10'
                       }`}
                     >
                       {page}
@@ -405,7 +399,7 @@ export default function EnhancedTable({
                       className={`px-3 py-1 rounded text-sm transition-colors ${
                         currentPage === totalPages
                           ? 'bg-bacelar-gold text-bacelar-black font-medium'
-                          : 'text-bacelar-gray-light hover:text-white'
+                          : 'text-white hover:text-bacelar-gold hover:bg-bacelar-gold/10'
                       }`}
                     >
                       {totalPages}
@@ -417,7 +411,7 @@ export default function EnhancedTable({
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 border border-bacelar-gray-light/30 rounded text-sm text-bacelar-gray-light hover:text-white hover:border-bacelar-gray-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1 border border-bacelar-gray-light/30 rounded text-sm text-white hover:text-bacelar-gold hover:border-bacelar-gold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Próximo
               </button>
