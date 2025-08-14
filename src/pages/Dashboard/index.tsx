@@ -52,7 +52,10 @@ export default function DashboardPage() {
     <div className="flex flex-col space-y-8">
       {/* Cabeçalho */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-lg text-bacelar-gold font-medium mt-1">Bacelar Legal Intelligence</p>
+        </div>
         <button className="rounded-md bg-bacelar-gold px-4 py-2 font-semibold text-bacelar-black transition hover:bg-bacelar-gold-light">
           + Novo Prazo
         </button>

@@ -3,7 +3,7 @@ import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
-import BacelarLogo from '../../assets/bacelar-logo.webp';
+import BacelarLogo from '../../assets/bacelar-logo.png';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -37,12 +37,8 @@ export default function LoginPage() {
       <div className="flex w-full max-w-md flex-col items-center space-y-8 rounded-lg bg-bacelar-gray-dark p-12 shadow-lg">
         
         {/* Logo da Bacelar Advocacia */}
-        <div className="flex flex-col items-center space-y-4">
-          <img src={BacelarLogo} alt="Bacelar Advocacia" className="w-24 h-24" />
-          <div className="text-center">
-            <div className="text-3xl font-serif text-bacelar-gold">BACELAR</div>
-            <div className="text-xs tracking-widest text-white/50 mt-1">LEGAL INTELLIGENCE</div>
-          </div>
+        <div className="flex flex-col items-center">
+          <img src={BacelarLogo} alt="Bacelar Advocacia" className="w-32 h-32" />
         </div>
 
         {/* --- O FORMULÁRIO CORRIGIDO --- */}

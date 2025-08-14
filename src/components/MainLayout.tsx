@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Home, ListChecks, User, Bell, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import BacelarLogo from '../assets/bacelar-logo.webp';
+import BacelarLogo from '../assets/bacelar-logo.png';
 
 const navItems = [
   // A rota '/' agora aponta para o Dashboard, então usamos o ícone Home para ele.
@@ -29,12 +29,8 @@ export default function MainLayout() {
         {/* Logo e navegação */}
         <div className="flex flex-col items-center space-y-8">
           {/* Logo da Bacelar Advocacia */}
-          <div className="flex flex-col items-center space-y-2">
+          <div className="flex flex-col items-center">
             <img src={BacelarLogo} alt="Bacelar Advocacia" className="w-16 h-16" />
-            <div className="text-center">
-              <div className="text-lg font-serif text-bacelar-gold">BACELAR</div>
-              <div className="text-xs tracking-wider text-white/60">LEGAL INTELLIGENCE</div>
-            </div>
           </div>
           <nav className="flex flex-col space-y-4 w-full px-4">
             {navItems.map((item) => (
