@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Home, ListChecks, User, Bell, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import BacelarLogo from '../assets/bacelar-logo.webp';
 
 const navItems = [
   // A rota '/' agora aponta para o Dashboard, então usamos o ícone Home para ele.
@@ -24,33 +25,40 @@ export default function MainLayout() {
 
   return (
     <div className="flex h-screen bg-bacelar-black text-white">
-      <aside className="flex w-20 flex-col items-center justify-between bg-bacelar-gray-dark py-8">
-        {/* Ícone principal e navegação */}
+      <aside className="flex w-64 flex-col items-center justify-between bg-bacelar-gray-dark py-8">
+        {/* Logo e navegação */}
         <div className="flex flex-col items-center space-y-8">
-          <div className="text-3xl font-serif text-bacelar-gold">B</div>
-          <nav className="flex flex-col items-center space-y-6">
+          {/* Logo da Bacelar Advocacia */}
+          <div className="flex flex-col items-center space-y-2">
+            <img src={BacelarLogo} alt="Bacelar Advocacia" className="w-16 h-16" />
+            <div className="text-center">
+              <div className="text-lg font-serif text-bacelar-gold">BACELAR</div>
+              <div className="text-xs tracking-wider text-white/60">LEGAL INTELLIGENCE</div>
+            </div>
+          </div>
+          <nav className="flex flex-col space-y-4 w-full px-4">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
-                className="rounded-lg p-2 text-bacelar-gray-light transition-colors hover:bg-bacelar-gold/10 hover:text-bacelar-gold aria-[current=page]:bg-bacelar-gold/10 aria-[current=page]:text-bacelar-gold"
-                title={item.label}
+                className="flex items-center space-x-3 rounded-lg p-3 text-bacelar-gray-light transition-colors hover:bg-bacelar-gold/10 hover:text-bacelar-gold aria-[current=page]:bg-bacelar-gold/10 aria-[current=page]:text-bacelar-gold"
                 end
               >
-                <item.icon size={24} />
+                <item.icon size={20} />
+                <span className="text-sm font-medium">{item.label}</span>
               </NavLink>
             ))}
           </nav>
         </div>
 
         {/* --- O BOTÃO DE SAIR --- */}
-        <div className="pb-4">
+        <div className="pb-4 w-full px-4">
           <button
             onClick={handleLogout}
-            className="rounded-lg p-2 text-bacelar-gray-light transition-colors hover:bg-red-500/10 hover:text-red-500"
-            title="Sair"
+            className="flex items-center space-x-3 w-full rounded-lg p-3 text-bacelar-gray-light transition-colors hover:bg-red-500/10 hover:text-red-500"
           >
-            <LogOut size={24} />
+            <LogOut size={20} />
+            <span className="text-sm font-medium">Sair</span>
           </button>
         </div>
         {/* -------------------- */}

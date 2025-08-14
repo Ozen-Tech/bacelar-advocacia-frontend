@@ -73,6 +73,8 @@ export default function PrazosPage() {
         responsible_id: filters.responsibleId,
         classification: filters.classification,
         status: filters.status,
+        due_date_from: filters.dueDateFrom,
+        due_date_to: filters.dueDateTo,
       });
 
       // Limpa parâmetros vazios para não poluir a URL
@@ -104,6 +106,13 @@ export default function PrazosPage() {
     
     fetchInitialData();
   }, []); // Executa apenas uma vez
+
+  // Efeito para reagir às mudanças nos filtros de data
+  useEffect(() => {
+    if (filters.dueDateFrom || filters.dueDateTo) {
+      fetchPrazos();
+    }
+  }, [filters.dueDateFrom, filters.dueDateTo]);
 
   // Handler para atualizar o estado dos filtros
   const handleFilterChange = (name: string, value: string) => {
@@ -173,7 +182,6 @@ export default function PrazosPage() {
         setFilters(prev => ({ ...prev, daysUntilDue: 'overdue' }));
         break;
     }
-    setTimeout(() => fetchPrazos(), 100);
   };
 
   // Funções de controle do Modal
