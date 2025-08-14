@@ -25,7 +25,6 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
     const headers = [
       'Processo',
       'Descrição',
-      'Tipo',
       'Data de Vencimento',
       'Classificação',
       'Status',
@@ -39,7 +38,6 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
       ...data.map(prazo => [
         `"${prazo.process_number || ''}",`,
         `"${prazo.task_description || ''}",`,
-        `"${prazo.type || ''}",`,
         `"${new Date(prazo.due_date).toLocaleDateString('pt-BR')}",`,
         `"${prazo.classification || ''}",`,
         `"${prazo.status || ''}",`,
@@ -101,7 +99,6 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
             <tr>
               <th>Processo</th>
               <th>Descrição</th>
-              <th>Tipo</th>
               <th>Vencimento</th>
               <th>Classificação</th>
               <th>Status</th>
@@ -121,7 +118,6 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
                 <tr class="${rowClass}">
                   <td>${prazo.process_number || 'N/A'}</td>
                   <td>${prazo.task_description || 'N/A'}</td>
-                  <td>${prazo.type || 'N/A'}</td>
                   <td>${new Date(prazo.due_date).toLocaleDateString('pt-BR')}</td>
                   <td>${prazo.classification || 'N/A'}</td>
                   <td>${prazo.status || 'pendente'}</td>
@@ -173,7 +169,6 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
             <Row>
               <Cell><Data ss:Type="String">Processo</Data></Cell>
               <Cell><Data ss:Type="String">Descrição</Data></Cell>
-              <Cell><Data ss:Type="String">Tipo</Data></Cell>
               <Cell><Data ss:Type="String">Data de Vencimento</Data></Cell>
               <Cell><Data ss:Type="String">Classificação</Data></Cell>
               <Cell><Data ss:Type="String">Status</Data></Cell>
@@ -185,7 +180,6 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
               <Row>
                 <Cell><Data ss:Type="String">${prazo.process_number || ''}</Data></Cell>
                 <Cell><Data ss:Type="String">${prazo.task_description || ''}</Data></Cell>
-                <Cell><Data ss:Type="String">${prazo.type || ''}</Data></Cell>
                 <Cell><Data ss:Type="String">${new Date(prazo.due_date).toLocaleDateString('pt-BR')}</Data></Cell>
                 <Cell><Data ss:Type="String">${prazo.classification || ''}</Data></Cell>
                 <Cell><Data ss:Type="String">${prazo.status || ''}</Data></Cell>
@@ -218,57 +212,84 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
       <button
         onClick={() => setShowExportMenu(!showExportMenu)}
         disabled={isExporting || deadlines.length === 0}
-        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center gap-2 px-4 py-2 bg-bacelar-gold text-bacelar-black font-semibold rounded-lg hover:bg-bacelar-gold-light disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        {isExporting ? 'Exportando...' : 'Exportar'}
+        {isExporting ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-bacelar-black border-t-transparent"></div>
+            Exportando...
+          </>
+        ) : (
+          'Exportar Dados'
+        )}
         {selectedDeadlines.length > 0 && (
-          <span className="bg-green-500 text-xs px-2 py-1 rounded-full">
+          <span className="bg-bacelar-black text-bacelar-gold text-xs px-2 py-1 rounded-full font-bold">
             {selectedDeadlines.length}
           </span>
         )}
       </button>
 
       {showExportMenu && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+        <div className="absolute right-0 mt-2 w-64 bg-bacelar-gray-dark rounded-lg shadow-2xl border border-bacelar-gold/30 z-50 overflow-hidden">
           <div className="py-2">
-            <div className="px-4 py-2 text-sm text-gray-500 border-b">
-              {selectedDeadlines.length > 0 
-                ? `Exportar ${selectedDeadlines.length} selecionados`
-                : `Exportar todos (${deadlines.length})`
-              }
+            <div className="px-4 py-3 text-sm text-bacelar-gold font-semibold border-b border-bacelar-gold/20 bg-bacelar-gray-dark/50">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                {selectedDeadlines.length > 0 
+                  ? `${selectedDeadlines.length} prazos selecionados`
+                  : `${deadlines.length} prazos disponíveis`
+                }
+              </div>
             </div>
             
             <button
               onClick={exportToCSV}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+              className="w-full text-left px-4 py-3 text-sm text-white hover:bg-bacelar-gold/10 flex items-center gap-3 transition-colors group"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Exportar CSV
+              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center group-hover:bg-green-500 transition-colors">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <div className="font-medium">Exportar CSV</div>
+                <div className="text-xs text-bacelar-gray-light">Planilha compatível com Excel</div>
+              </div>
             </button>
             
             <button
               onClick={exportToExcel}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+              className="w-full text-left px-4 py-3 text-sm text-white hover:bg-bacelar-gold/10 flex items-center gap-3 transition-colors group"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a4 4 0 01-4-4V5a4 4 0 014-4h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a4 4 0 01-4 4z" />
-              </svg>
-              Exportar Excel
+              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a4 4 0 01-4-4V5a4 4 0 014-4h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a4 4 0 01-4 4z" />
+                </svg>
+              </div>
+              <div>
+                <div className="font-medium">Exportar Excel</div>
+                <div className="text-xs text-bacelar-gray-light">Formato nativo do Microsoft Excel</div>
+              </div>
             </button>
             
             <button
               onClick={exportToPDF}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+              className="w-full text-left px-4 py-3 text-sm text-white hover:bg-bacelar-gold/10 flex items-center gap-3 transition-colors group"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-              Exportar PDF
+              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center group-hover:bg-red-500 transition-colors">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <div className="font-medium">Exportar PDF</div>
+                <div className="text-xs text-bacelar-gray-light">Relatório formatado para impressão</div>
+              </div>
             </button>
           </div>
         </div>

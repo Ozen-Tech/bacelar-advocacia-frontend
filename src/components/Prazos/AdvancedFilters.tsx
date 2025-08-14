@@ -59,47 +59,45 @@ export default function AdvancedFilters({
   ];
 
   return (
-    <div className="bg-bacelar-gray-dark rounded-lg border border-bacelar-gray-light/20 p-6 space-y-6">
+    <div className="space-y-4">
       {/* Filtros Rápidos */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-3">Filtros Rápidos</h3>
-        <div className="flex flex-wrap gap-2">
-          {quickFilters.map(filter => (
-            <button
-              key={filter.value}
-              onClick={() => onQuickFilter(filter.value)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold text-white transition-colors ${filter.color}`}
-            >
-              {filter.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3 mb-2">
+          <h3 className="text-sm font-semibold text-bacelar-gold">Filtros Rápidos:</h3>
+          <div className="flex flex-wrap gap-2">
+            {quickFilters.map(filter => (
+              <button
+                key={filter.value}
+                onClick={() => onQuickFilter(filter.value)}
+                className={`px-2 py-1 rounded-md text-xs font-medium text-white transition-colors ${filter.color}`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Formulário de Filtros */}
-      <form onSubmit={onFilterSubmit} className="space-y-4">
+      <form onSubmit={onFilterSubmit} className="space-y-3">
         {/* Linha 1 - Filtros Básicos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
           <div>
-            <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-              Busca Geral
-            </label>
             <Input
               name="search"
-              placeholder="Buscar em descrição, processo..."
+              placeholder="Buscar descrição, processo..."
               value={filters.search}
               onChange={(e) => onFilterChange('search', e.target.value)}
+              className="text-sm"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-              Tipo de Prazo
-            </label>
             <Select
               name="type"
               value={filters.type}
               onChange={(e) => onFilterChange('type', e.target.value)}
+              className="text-sm"
             >
               <option value="">Todos os Tipos</option>
               {typeOptions.map(type => (
@@ -109,13 +107,11 @@ export default function AdvancedFilters({
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-              Responsável
-            </label>
             <Select
               name="responsibleId"
               value={filters.responsibleId}
               onChange={(e) => onFilterChange('responsibleId', e.target.value)}
+              className="text-sm"
             >
               <option value="">Todos os Responsáveis</option>
               {users.map(user => (
@@ -125,13 +121,11 @@ export default function AdvancedFilters({
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-              Classificação
-            </label>
             <Select
               name="classification"
               value={filters.classification}
               onChange={(e) => onFilterChange('classification', e.target.value)}
+              className="text-sm"
             >
               <option value="">Todas as Classificações</option>
               <option value="normal">Normal</option>
@@ -142,52 +136,48 @@ export default function AdvancedFilters({
         </div>
 
         {/* Botão para mostrar filtros avançados */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <button
             type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="text-bacelar-gold hover:text-bacelar-gold-light transition-colors text-sm font-medium"
+            className="text-bacelar-gold hover:text-bacelar-gold-light transition-colors text-xs font-medium px-3 py-1 rounded-md border border-bacelar-gold/30 hover:border-bacelar-gold/50"
           >
-            {showAdvanced ? '▼ Ocultar Filtros Avançados' : '▶ Mostrar Filtros Avançados'}
+            {showAdvanced ? '▲ Ocultar Avançados' : '▼ Filtros Avançados'}
           </button>
         </div>
 
         {/* Filtros Avançados */}
         {showAdvanced && (
-          <div className="space-y-4 pt-4 border-t border-bacelar-gray-light/20">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-3 pt-3 border-t border-bacelar-gray-light/20">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
               <div>
-                <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-                  Vencimento De
-                </label>
                 <Input
                   type="date"
                   name="dueDateFrom"
                   value={filters.dueDateFrom}
                   onChange={(e) => onFilterChange('dueDateFrom', e.target.value)}
+                  placeholder="Vencimento de"
+                  className="text-sm"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-                  Vencimento Até
-                </label>
                 <Input
                   type="date"
                   name="dueDateTo"
                   value={filters.dueDateTo}
                   onChange={(e) => onFilterChange('dueDateTo', e.target.value)}
+                  placeholder="Vencimento até"
+                  className="text-sm"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-                  Dias até Vencimento
-                </label>
                 <Select
                   name="daysUntilDue"
                   value={filters.daysUntilDue}
                   onChange={(e) => onFilterChange('daysUntilDue', e.target.value)}
+                  className="text-sm"
                 >
                   <option value="">Qualquer prazo</option>
                   <option value="1">Hoje</option>
@@ -198,43 +188,35 @@ export default function AdvancedFilters({
                   <option value="overdue">Vencidos</option>
                 </Select>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-                  Número do Processo
-                </label>
-                <Input
-                  name="processNumber"
-                  placeholder="Ex: 1234567-89.2023.8.26.0001"
-                  value={filters.processNumber}
-                  onChange={(e) => onFilterChange('processNumber', e.target.value)}
-                />
-              </div>
               
               <div>
-                <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-                  Partes
-                </label>
+                <Input
+                  name="processNumber"
+                  placeholder="Número do Processo"
+                  value={filters.processNumber}
+                  onChange={(e) => onFilterChange('processNumber', e.target.value)}
+                  className="text-sm"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
                 <Input
                   name="parties"
                   placeholder="Nome das partes envolvidas"
                   value={filters.parties}
                   onChange={(e) => onFilterChange('parties', e.target.value)}
+                  className="text-sm"
                 />
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
               <div>
-                <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-                  Status
-                </label>
                 <Select
                   name="status"
                   value={filters.status}
                   onChange={(e) => onFilterChange('status', e.target.value)}
+                  className="text-sm"
                 >
                   <option value="">Todos os Status</option>
                   <option value="pendente">Pendente</option>
@@ -247,20 +229,20 @@ export default function AdvancedFilters({
         )}
 
         {/* Botões de Ação */}
-        <div className="flex flex-wrap gap-3 pt-4">
+        <div className="flex flex-wrap gap-2 pt-3 justify-center">
           <button
             type="submit"
-            className="rounded-md bg-bacelar-gold px-6 py-2 font-bold text-bacelar-black transition hover:bg-bacelar-gold-light"
+            className="rounded-md bg-bacelar-gold px-4 py-2 text-sm font-semibold text-bacelar-black transition hover:bg-bacelar-gold-light"
           >
-            🔍 Aplicar Filtros
+            🔍 Aplicar
           </button>
           
           <button
             type="button"
             onClick={onClearFilters}
-            className="rounded-md border border-bacelar-gray-light/30 px-6 py-2 font-medium text-bacelar-gray-light transition hover:border-bacelar-gray-light hover:text-white"
+            className="rounded-md border border-bacelar-gray-light/30 px-4 py-2 text-sm font-medium text-bacelar-gray-light transition hover:border-bacelar-gray-light hover:text-white"
           >
-            🗑️ Limpar Filtros
+            🗑️ Limpar
           </button>
         </div>
       </form>

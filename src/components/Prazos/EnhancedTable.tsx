@@ -16,7 +16,7 @@ interface EnhancedTableProps {
   loading?: boolean;
 }
 
-type SortField = 'due_date' | 'task_description' | 'process_number' | 'type' | 'status' | 'classification';
+type SortField = 'due_date' | 'task_description' | 'process_number' | 'status' | 'classification';
 type SortDirection = 'asc' | 'desc';
 
 export default function EnhancedTable({
@@ -229,11 +229,11 @@ export default function EnhancedTable({
               
               <th className={`${densityClasses[density]} text-left`}>
                 <button
-                  onClick={() => handleSort('type')}
+                  onClick={() => handleSort('task_description')}
                   className="flex items-center space-x-1 text-bacelar-gray-light hover:text-white font-medium"
                 >
-                  <span>Tipo</span>
-                  <span>{getSortIcon('type')}</span>
+                  <span>Descrição</span>
+                  <span>{getSortIcon('task_description')}</span>
                 </button>
               </th>
               
@@ -293,7 +293,7 @@ export default function EnhancedTable({
                 </td>
                 
                 <td className={`${densityClasses[density]} text-bacelar-gray-light`}>
-                  {deadline.type || 'N/A'}
+                  {deadline.task_description || 'N/A'}
                 </td>
                 
                 <td className={`${densityClasses[density]} text-bacelar-gray-light`}>

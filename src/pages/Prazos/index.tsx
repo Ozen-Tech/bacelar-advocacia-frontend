@@ -272,56 +272,41 @@ export default function PrazosPage() {
 
   return (
     <>
-      <div className="flex flex-col space-y-8">
+      <div className="flex flex-col space-y-6">
+        {/* Cabeçalho */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-          <h1 className="text-4xl font-light text-white">LISTA DE PRAZOS</h1>
-          <button
-            onClick={() => setShowDashboard(!showDashboard)}
-            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-              showDashboard 
-                ? 'bg-bacelar-gold/20 text-bacelar-gold hover:bg-bacelar-gold/30' 
-                : 'bg-bacelar-gray-dark text-bacelar-gray-light hover:bg-bacelar-gray-light/20'
-            }`}
-          >
-            {showDashboard ? 'Ocultar Dashboard' : 'Mostrar Dashboard'}
-          </button>
-        </div>
-        <div className="flex items-center gap-3">
-          <ExportActions 
-            deadlines={prazos} 
-            selectedDeadlines={selectedDeadlines}
-          />
-          {user?.profile === 'admin' && (
-            <button 
-              onClick={handleOpenCreateModal}
-              className="rounded-md bg-bacelar-gold px-5 py-2 text-center font-bold text-bacelar-black transition hover:bg-bacelar-gold-light"
+            <h1 className="text-4xl font-light text-white">LISTA DE PRAZOS</h1>
+            <button
+              onClick={() => setShowDashboard(!showDashboard)}
+              className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                showDashboard 
+                  ? 'bg-bacelar-gold/20 text-bacelar-gold hover:bg-bacelar-gold/30' 
+                  : 'bg-bacelar-gray-dark text-bacelar-gray-light hover:bg-bacelar-gray-light/20'
+              }`}
             >
-              NOVO PRAZO
+              {showDashboard ? 'Ocultar Dashboard' : 'Mostrar Dashboard'}
             </button>
-          )}
-        </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {user?.profile === 'admin' && (
+              <button 
+                onClick={handleOpenCreateModal}
+                className="rounded-md bg-bacelar-gold px-5 py-2 text-center font-bold text-bacelar-black transition hover:bg-bacelar-gold-light"
+              >
+                NOVO PRAZO
+              </button>
+            )}
+          </div>
         </div>
         <div className="border-b border-bacelar-gold/20" />
 
         {/* Dashboard */}
-         {showDashboard && (
-           <div className="mb-6">
-             <PrazosDashboard prazos={prazos} loading={loading} />
-           </div>
-         )}
-
-        {/* Filtros Avançados */}
-         <div className="mb-6">
-           <AdvancedFilters
-             filters={filters}
-             users={users}
-             onFilterChange={handleFilterChange}
-             onFilterSubmit={handleFilterSubmit}
-             onClearFilters={handleClearFilters}
-             onQuickFilter={handleQuickFilter}
-           />
-         </div>
+        {showDashboard && (
+          <div className="mb-6">
+            <PrazosDashboard prazos={prazos} loading={loading} />
+          </div>
+        )}
 
         {/* Importação Excel - apenas para admins */}
         {user?.profile === 'admin' && (
@@ -331,37 +316,59 @@ export default function PrazosPage() {
         )}
 
         {/* Ações em Lote */}
-         {selectedDeadlines.length > 0 && (
-           <div className="mb-6">
-             <BulkActions
-               selectedDeadlines={selectedDeadlines}
-               deadlines={prazos}
-               users={users}
-               onBulkStatusChange={handleBulkStatusChange}
-               onBulkResponsibleChange={handleBulkResponsibleChange}
-               onBulkDelete={handleBulkDelete}
-               onClearSelection={() => setSelectedDeadlines([])}
-             />
-           </div>
-         )}
+        {selectedDeadlines.length > 0 && (
+          <div className="mb-4">
+            <BulkActions
+              selectedDeadlines={selectedDeadlines}
+              deadlines={prazos}
+              users={users}
+              onBulkStatusChange={handleBulkStatusChange}
+              onBulkResponsibleChange={handleBulkResponsibleChange}
+              onBulkDelete={handleBulkDelete}
+              onClearSelection={() => setSelectedDeadlines([])}
+            />
+          </div>
+        )}
+
+        {/* Área de Controles - Filtros e Exportação */}
+        <div className="bg-bacelar-gray-dark/50 rounded-lg p-4 border border-bacelar-gold/20">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            <div className="flex-1 w-full lg:w-auto">
+              <AdvancedFilters
+                filters={filters}
+                users={users}
+                onFilterChange={handleFilterChange}
+                onFilterSubmit={handleFilterSubmit}
+                onClearFilters={handleClearFilters}
+                onQuickFilter={handleQuickFilter}
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <ExportActions 
+                deadlines={prazos} 
+                selectedDeadlines={selectedDeadlines}
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Legenda de Urgência */}
-        <div className="mb-6">
+        <div className="mb-4">
           <UrgencyLegend />
         </div>
 
         {/* Tabela Aprimorada */}
-         <EnhancedTable
-           deadlines={prazos}
-           users={users}
-           currentUser={user}
-           selectedDeadlines={selectedDeadlines}
-           onSelectionChange={setSelectedDeadlines}
-           onEdit={handleOpenEditModal}
-           onDelete={handleOpenDeleteModal}
-           onViewDetails={handleViewDetails}
-           loading={loading}
-         />
+        <EnhancedTable
+          deadlines={prazos}
+          users={users}
+          currentUser={user}
+          selectedDeadlines={selectedDeadlines}
+          onSelectionChange={setSelectedDeadlines}
+          onEdit={handleOpenEditModal}
+          onDelete={handleOpenDeleteModal}
+          onViewDetails={handleViewDetails}
+          loading={loading}
+        />
       </div>
 
       <Modal 

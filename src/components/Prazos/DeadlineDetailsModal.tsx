@@ -203,10 +203,10 @@ export default function DeadlineDetailsModal({
 
                     <div>
                       <label className="block text-sm font-medium text-bacelar-gray-light mb-1">
-                        Tipo
+                        Descrição da Tarefa
                       </label>
                       <p className="text-white bg-bacelar-gray-light/10 p-3 rounded border border-bacelar-gray-light/20">
-                        {deadline.type || 'N/A'}
+                        {deadline.task_description || 'N/A'}
                       </p>
                     </div>
                   </div>

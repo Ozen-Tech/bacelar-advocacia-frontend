@@ -85,7 +85,7 @@ export default function PrazoDetailPage() {
             <h1 className="text-3xl font-light text-white mb-6">Detalhes do Prazo</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 text-base">
               <div><strong className='block font-medium text-bacelar-gray-light'>Processo:</strong> {deadline.process_number || 'Não informado'}</div>
-              <div><strong className='block font-medium text-bacelar-gray-light'>Tipo de Prazo:</strong> {deadline.type || 'Não informado'}</div>
+              <div><strong className='block font-medium text-bacelar-gray-light'>Descrição da Tarefa:</strong> {deadline.task_description || 'Não informado'}</div>
               <div><strong className='block font-medium text-bacelar-gray-light'>Partes:</strong> {deadline.parties || 'Não informado'}</div>
               <div><strong className='block font-medium text-bacelar-gray-light'>Data de Vencimento:</strong> {formatDate(deadline.due_date)}</div>
               <div><strong className='block font-medium text-bacelar-gray-light'>Status:</strong> <span className="capitalize">{deadline.status}</span></div>
