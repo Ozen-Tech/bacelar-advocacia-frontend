@@ -30,7 +30,7 @@ export default function MainLayout() {
         <div className="flex flex-col items-center space-y-8">
           {/* Logo da Bacelar Advocacia */}
           <div className="flex flex-col items-center">
-            <img src={BacelarLogo} alt="Bacelar Advocacia" className="w-16 h-16" />
+            <img src={BacelarLogo} alt="Bacelar Advocacia" className="w-20 h-auto object-contain" />
           </div>
           <nav className="flex flex-col space-y-4 w-full px-4">
             {navItems.map((item) => (

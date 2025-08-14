@@ -38,7 +38,7 @@ export default function LoginPage() {
         
         {/* Logo da Bacelar Advocacia */}
         <div className="flex flex-col items-center">
-          <img src={BacelarLogo} alt="Bacelar Advocacia" className="w-32 h-32" />
+          <img src={BacelarLogo} alt="Bacelar Advocacia" className="w-64 h-auto object-contain" />
         </div>
 
         {/* --- O FORMULÁRIO CORRIGIDO --- */}
