@@ -280,7 +280,7 @@ export default function PrazosPage() {
 
   return (
     <>
-      <div className="flex flex-col space-y-6">
+      <div className="flex flex-col space-y-6 document-watermark">
         {/* Cabeçalho */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

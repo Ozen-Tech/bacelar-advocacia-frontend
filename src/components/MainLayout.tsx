@@ -61,7 +61,7 @@ export default function MainLayout() {
       </aside>
 
       {/* Conteúdo Principal da Página */}
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-8 watermark-background">
         <Outlet /> {/* O React Router renderiza a página ativa aqui */}
       </main>
     </div>

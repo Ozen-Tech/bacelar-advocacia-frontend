@@ -70,7 +70,7 @@ export default function PrazoDetailPage() {
   }
 
   return (
-    <div className="flex flex-col space-y-8">
+    <div className="flex flex-col space-y-8 document-watermark">
       <Link to="/prazos" className="flex items-center space-x-2 text-bacelar-gold hover:underline">
         <ArrowLeft size={16} />
         <span>Voltar para a lista de prazos</span>

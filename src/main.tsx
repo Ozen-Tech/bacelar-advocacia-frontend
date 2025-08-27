@@ -2,6 +2,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css' // <-- GARANTA QUE ESTA LINHA EXISTA E ESTEJA CORRETA
+import './styles/watermark.css' // Estilos de marca d'água
 import { AppRouter } from './router';
 import { AuthProvider } from './context/AuthContext';
 

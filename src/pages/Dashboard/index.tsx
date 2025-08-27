@@ -49,7 +49,7 @@ export default function DashboardPage() {
   }
   
   return (
-    <div className="flex flex-col space-y-8">
+    <div className="flex flex-col space-y-8 document-watermark">
       {/* Cabeçalho */}
       <div className="flex items-center justify-between">
         <div>

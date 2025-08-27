@@ -1,6 +1,7 @@
 // src/components/Prazos/ExportActions.tsx
 import { useState } from 'react';
 import { DeadlinePublic } from '../../schemas/deadline';
+import BacelarLogo from '../../assets/bacelar-logo.png';
 
 interface ExportActionsProps {
   deadlines: DeadlinePublic[];
@@ -71,12 +72,46 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Relatório de Prazos</title>
+        <title>Relatório de Prazos - Bacelar Legal Intelligence</title>
         <style>
-          body { font-family: Arial, sans-serif; margin: 20px; }
-          .header { text-align: center; margin-bottom: 30px; }
-          .header h1 { color: #1f2937; margin-bottom: 10px; }
-          .header p { color: #6b7280; }
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+            position: relative;
+          }
+          .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 72px;
+            color: rgba(212, 175, 55, 0.1);
+            font-weight: bold;
+            z-index: -1;
+            pointer-events: none;
+            white-space: nowrap;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #d4af37;
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+          }
+          .header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+          }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th, td { border: 1px solid #d1d5db; padding: 8px; text-align: left; font-size: 12px; }
           th { background-color: #f3f4f6; font-weight: bold; }
@@ -88,8 +123,10 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
         </style>
       </head>
       <body>
+        <div class="watermark">BACELAR LEGAL INTELLIGENCE</div>
         <div class="header">
-          <h1>Relatório de Prazos</h1>
+          <h1>BACELAR LEGAL INTELLIGENCE</h1>
+          <p>Relatório de Prazos - ${new Date().toLocaleDateString('pt-BR')}</p>
           <p>Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
           <p>Total de prazos: ${data.length}</p>
         </div>
@@ -156,7 +193,7 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
     setIsExporting(true);
     const data = getExportData();
     
-    // Criar conteúdo XML para Excel
+    // Criar conteúdo XML para Excel com marca d'água
     const excelContent = `
       <?xml version="1.0"?>
       <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
@@ -164,17 +201,32 @@ export default function ExportActions({ deadlines, selectedDeadlines = [] }: Exp
         xmlns:x="urn:schemas-microsoft-com:office:excel"
         xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
         xmlns:html="http://www.w3.org/TR/REC-html40">
+        <Styles>
+          <Style ss:ID="watermark">
+            <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+            <Font ss:FontName="Arial" ss:Size="16" ss:Bold="1" ss:Color="#D4AF37"/>
+            <Interior ss:Color="#1A1A1A" ss:Pattern="Solid"/>
+          </Style>
+          <Style ss:ID="header">
+            <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+            <Font ss:FontName="Arial" ss:Size="12" ss:Bold="1" ss:Color="#FFFFFF"/>
+            <Interior ss:Color="#D4AF37" ss:Pattern="Solid"/>
+          </Style>
+        </Styles>
         <Worksheet ss:Name="Prazos">
           <Table>
             <Row>
-              <Cell><Data ss:Type="String">Processo</Data></Cell>
-              <Cell><Data ss:Type="String">Descrição</Data></Cell>
-              <Cell><Data ss:Type="String">Data de Vencimento</Data></Cell>
-              <Cell><Data ss:Type="String">Classificação</Data></Cell>
-              <Cell><Data ss:Type="String">Status</Data></Cell>
-              <Cell><Data ss:Type="String">Partes</Data></Cell>
-              <Cell><Data ss:Type="String">Responsável</Data></Cell>
-              <Cell><Data ss:Type="String">Criado em</Data></Cell>
+              <Cell ss:MergeAcross="7" ss:StyleID="watermark"><Data ss:Type="String">BACELAR LEGAL INTELLIGENCE</Data></Cell>
+            </Row>
+            <Row>
+              <Cell ss:StyleID="header"><Data ss:Type="String">Processo</Data></Cell>
+              <Cell ss:StyleID="header"><Data ss:Type="String">Descrição</Data></Cell>
+              <Cell ss:StyleID="header"><Data ss:Type="String">Data de Vencimento</Data></Cell>
+              <Cell ss:StyleID="header"><Data ss:Type="String">Classificação</Data></Cell>
+              <Cell ss:StyleID="header"><Data ss:Type="String">Status</Data></Cell>
+              <Cell ss:StyleID="header"><Data ss:Type="String">Partes</Data></Cell>
+              <Cell ss:StyleID="header"><Data ss:Type="String">Responsável</Data></Cell>
+              <Cell ss:StyleID="header"><Data ss:Type="String">Criado em</Data></Cell>
             </Row>
             ${data.map(prazo => `
               <Row>

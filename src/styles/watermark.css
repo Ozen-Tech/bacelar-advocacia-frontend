@@ -1,0 +1,63 @@
+/* Marca d'água para impressão e visualização */
+@media print {
+  body::before {
+    content: "BACELAR LEGAL INTELLIGENCE";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 72px;
+    color: rgba(212, 175, 55, 0.1);
+    font-weight: bold;
+    z-index: -1;
+    pointer-events: none;
+    white-space: nowrap;
+    font-family: Arial, sans-serif;
+  }
+}
+
+/* Marca d'água sutil para telas */
+.watermark-background {
+  position: relative;
+}
+
+.watermark-background::before {
+  content: "BACELAR LEGAL INTELLIGENCE";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 48px;
+  color: rgba(212, 175, 55, 0.03);
+  font-weight: bold;
+  z-index: -1;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: Arial, sans-serif;
+}
+
+/* Marca d'água para documentos */
+.document-watermark {
+  position: relative;
+  overflow: hidden;
+}
+
+.document-watermark::before {
+  content: "BACELAR LEGAL INTELLIGENCE";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 36px;
+  color: rgba(212, 175, 55, 0.08);
+  font-weight: bold;
+  z-index: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: Arial, sans-serif;
+}
+
+.document-watermark > * {
+  position: relative;
+  z-index: 1;
+}

@@ -66,7 +66,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="flex flex-col space-y-8 max-w-4xl mx-auto">
+    <div className="flex flex-col space-y-8 max-w-4xl mx-auto document-watermark">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-light text-white">NOTIFICAÇÕES</h1>
         <button 

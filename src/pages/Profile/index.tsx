@@ -47,7 +47,7 @@ export default function ProfilePage() {
   };
   
   return (
-    <div className="flex flex-col space-y-8 max-w-4xl mx-auto">
+    <div className="flex flex-col space-y-8 max-w-4xl mx-auto document-watermark">
       <div className="text-center">
         <h1 className="text-5xl font-serif text-bacelar-gold">{user?.name}</h1>
         <p className="text-bacelar-gray-light mt-1">{user?.profile.toUpperCase()}</p>

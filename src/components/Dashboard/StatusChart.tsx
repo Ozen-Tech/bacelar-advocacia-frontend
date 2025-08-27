@@ -47,7 +47,7 @@ export default function StatusChart({ status_counts }: ChartData) {
   };
 
   return (
-    <div style={{ width: '100%', height: 300 }}>
+    <div className="document-watermark" style={{ width: '100%', height: 300 }}>
       <ResponsiveContainer>
         <PieChart>
           <Pie

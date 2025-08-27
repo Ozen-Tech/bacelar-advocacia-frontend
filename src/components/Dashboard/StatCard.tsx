@@ -10,7 +10,7 @@ interface StatCardProps {
 
 export default function StatCard({ title, value, Icon, className }: StatCardProps) {
   return (
-    <div className={`flex flex-col justify-between rounded-lg bg-bacelar-gray-dark p-6 shadow-md ${className}`}>
+    <div className={`flex flex-col justify-between rounded-lg bg-bacelar-gray-dark p-6 shadow-md document-watermark ${className}`}>
       <div>
         <h3 className="text-sm font-semibold uppercase tracking-wider text-bacelar-gray-light">
           {title}
